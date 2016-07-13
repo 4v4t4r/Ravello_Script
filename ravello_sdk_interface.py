@@ -91,22 +91,22 @@ class Rev_Connect:
     # Common operations between Billing_ToMonth and Billing_Month
     def __bill__(self, billing):
 
-        total = self.Rev_Parser.Parse_Total_BillingMonth(billing)
+        total,Lib_Charge = self.Rev_Parser.Parse_Total_BillingMonth(billing)
         applist = []
         for x in billing:
             # Check if this is not a charge entry.
             if "appName" not in x:
                 continue
             applist.append(self.Rev_Parser.Parse_AppBillingInfo(x))
-        return total, applist
+        return total, Lib_Charge , applist
 
     # Get all applications cost since the beginning of the month
     # Returns charges for month as a dict, and list of apps charges
     def Rev_GetBillingToMonth(self):
         self.logger.debug("Retrieve Billing Since beging of this Month <" + datetime.datetime.now().strftime("%m %Y") + ">")
         billing = self.Rev_client.get_billing()
-        total, applist = self.__bill__(billing)
-        return {"month": datetime.datetime.now().strftime("%m %Y"), "total": total, "appList": applist}
+        total, Lib_Storage, applist = self.__bill__(billing)
+        return {"month": datetime.datetime.now().strftime("%m %Y"), "total": total, "Lib_Store_Charge":Lib_Storage, "appList": applist}
 
     # Get all applications cost since the beginning of the month
     # The Format for the month is XX
@@ -115,10 +115,10 @@ class Rev_Connect:
     def Rev_GetBillingMonth(self, month, year):
         self.logger.debug("Retrieve Billing for <" + str(month) + "/" + str(year) + ">")
         billing = self.Rev_client.get_billing_for_month(year, month)
-        total, applist = self.__bill__(billing)
+        total, Lib_Storage,applist = self.__bill__(billing)
         # d = date(int(year),int(month)
 
-        return {"month": str(month) + " " + str(year), "total": total, "appList": applist}
+        return {"month": str(month) + " " + str(year), "total": total, "Lib_Store_Charge":Lib_Storage, "appList": applist}
 
     # Get list of Vms running under a certain application.
     def Rev_Get_VmList(self, App_id):

@@ -124,13 +124,17 @@ class Rev_Parse:
         self.logger.debug("Parse Total Billing month ")
         dict = {}
         total =0
+        Lib_charge =0
 
         for x in records:
             if("charges" in x.keys()):
-                for x in x["charges"]:
-                    total += x["summaryPrice"]
-        self.logger.debug("Parse Total Billing month "+str(total))
-        return total
+                for y in x["charges"]:
+                    total += y["summaryPrice"]
+                    if "productName" in y.keys():
+                        if y["productName"] == "Library, GB" :
+                            Lib_charge += float(y["summaryPrice"])
+
+        return total,Lib_charge
     
     # Takes in Billing record for an App,
     # Returns a dictionary with the following items:
