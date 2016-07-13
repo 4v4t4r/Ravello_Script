@@ -37,6 +37,8 @@ DB = ""
 
 # Setup the Reportng level for the script.
 logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.WARN)
+#logging.basicConfig(level=logging.INFO)
 
 # Name of the Main Program section
 logger = logging.getLogger("__Main__")
@@ -61,7 +63,7 @@ def main():
     parser.add_argument('-gdbr',metavar = '"MM YYYY"',nargs=1,help = "Get Data from Ravello and Generate a report - Provide date")
     parser.add_argument('-report',metavar = ('"MM YYYY"', '"Report_On"'), nargs=2,
                         help ='''Generate a Report from Local DB. 
-                                 Report_On can be one of the following [ALL - Users - Departments - Regions].
+                                 Report_On can be one of the following [ALL - Billing- Users - Departments - Regions].
                         ''')
 
 
@@ -174,8 +176,8 @@ def main():
         Rev_DB.Store(list,"Billing")
 
         # Report Generation
-        Rev_csv = CSV_Rev(filename="result.csv",perm='wb')
-        csv.store_Rows(Rev_DB.Report())
+        Rev_csv = CSV_Rev(filename="Report_ALL.csv",perm='wb')
+        Rev_csv.store_Rows(Rev_DB.Report())
         
         
     # Generate a report
@@ -203,84 +205,34 @@ def main():
         if report == "ALL" :
             ####################################################
             logger.debug("Reporting \"ALL\" Date: "+str(month))
-            
-            Rev_csv = CSV_Rev(filename="Report_All.csv",perm='wb')
-            
-            result_user = Rev_DB.Report_Users_Total(month)
-            result_course = Rev_DB.Report_Courses_Total(month)
-            result_dept = Rev_DB.Report_Dept_Total(month)
-            result_region = Rev_DB.Report_Region_Total(month)
+            Rev_csv = CSV_Rev(filename="Report_All_"+month+".csv",perm='wb')
+            #print (Rev_DB.Report_ALL(month))
+            Rev_csv.store_Rows(Rev_DB.Report_ALL(month))
 
-            
-            list.append(["All Users Information"])
-            list.append(["Username","Courses","Department","Total"])
-            for l in result_user:
-                list.append([l["_id"],l["Courses"],l["Department"],l["total"]])
-
-            list.append(["_"*100]) # Empty line
-            list.append(["All Courses Information"])
-            list.append(["Course name","# of users","Department","total"])
-            for l in result_course:
-                list.append([l["_id"],l["# of students"],l["Department"],l["total"]])
-
-            list.append(["_"*100]) # Empty line
-            list.append(["All Department Information"])
-            list.append(["Department","# of students","Total"])
-            for l in result_dept:
-                list.append([l["_id"],l["# of students"],l["total"]])
-
-            list.append(["_"*100]) # Empty line
-            list.append(["All Region Information"])
-            list.append(["Region","# of students","Total"])
-            for l in result_region:
-                list.append([l["_id"],l["# of students"],l["total"]])
-            
-            Rev_csv.store_Rows(list)
-
+        elif report == "Billing":
+            logger.debug("Reporting \"User\"")
+            Rev_csv = CSV_Rev(filename="Report_Billing_"+month+".csv", perm='wb')
+            Rev_csv.store_Rows(Rev_DB.Report_Cost_Total(month))
                 
         elif report == "Users":
             logger.debug("Reporting \"User\"")
-            csv = CSV_Rev(filename="Report_Users.csv",perm='wb')
-            result_user = Rev_DB.Report_Users_Total(month)
-            list.append(["All Users Information"])
-            list.append(["Username","Courses","Department","Total"])
-            for l in result_user:
-                list.append([l["_id"],l["Courses"],l["Department"],l["total"]])
+            Rev_csv = CSV_Rev(filename="Report_Users_"+month+".csv",perm='wb')
+            Rev_csv.store_Rows(Rev_DB.Report_Users_Total(month))
 
-            Rev_csv.store_Rows(list)
-                                                        
-        
         elif report == "Courses":
             logger.debug("Reporting \"Course\"")
-            result_course = Rev_DB.Report_Courses_Total(month)
-            csv = CSV_Rev(filename="Report_Courses.csv",perm='wb')
-            list.append(["All Courses Information"])
-            list.append(["Course name","# of users","Department","total"])
-            for l in result_course:
-                list.append([l["_id"],l["# of students"],l["Department"],l["total"]])
-            Rev_csv.store_Rows(list)
+            Rev_csv = CSV_Rev(filename="Report_Courses_"+month+".csv",perm='wb')
+            Rev_csv.store_Rows(Rev_DB.Report_Courses_Total(month))
                                                         
         elif report == "Departments":
             logger.debug("Reporting \"Department\"")
-            result_dept = Rev_DB.Report_Dept_Total(month)
-            Rev_csv = CSV_Rev(filename="Report_Department.csv",perm='wb')
-            list.append(["All Department Information"])
-            list.append(["Department","# of students","Total"])
-            for l in result_dept:
-                list.append([l["_id"],l["# of students"],l["total"]])
-            Rev_csv.store_Rows(list)
-                   
+            Rev_csv = CSV_Rev(filename="Report_Department_"+month+".csv",perm='wb')
+            Rev_csv.store_Rows(Rev_DB.Report_Dept_Total(month))
             
         elif report == "Regions":
             logger.debug("Reporting \"Region\"")
-            Rev_csv = CSV_Rev(filename="Report_Region.csv",perm='wb')
-            result_region = Rev_DB.Report_Region_Total(month)
-            list.append(["All Region Information"])
-            list.append(["Region","# of students","Total"])
-            for l in result_region:
-                list.append([l["_id"],l["# of students"],l["total"]])
-            
-            Rev_csv.store_Rows(list)
+            Rev_csv = CSV_Rev(filename="Report_Region_"+month+".csv",perm='wb')
+            Rev_csv.store_Rows(Rev_DB.Report_Regions_Total(month))
                                                         
 
         
